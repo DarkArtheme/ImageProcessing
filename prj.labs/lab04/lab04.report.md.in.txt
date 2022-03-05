@@ -1,6 +1,8 @@
 ## Работа 4. Использование бинаризации для анализа изображений (выделение символов) 
-автор: Фамилия И.О.
-url: https://gitlab.com/2021-misis-spring/polevoy_d_v/
+Автор: Богданов А.А. <br>
+Дата: @time_stemp@ <br>
+
+url: https://github.com/DarkArtheme/ImageProcessing/tree/master/prj.labs/lab04
 
 ### Задание
 1. Самостоятельно изготовить эталонный вариант бинаризованного изображения.

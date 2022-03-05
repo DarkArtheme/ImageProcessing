@@ -11,7 +11,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_CURRENT_SOURCE_DIR}/bi
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin.dbg)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/bin.rel)
 
-project(polevoy_d_v)
+project(bogdanov_a_a)
 string(TIMESTAMP time_stemp "%Y-%m-%dT%H:%M:%S")
 
 find_package(OpenCV REQUIRED)
