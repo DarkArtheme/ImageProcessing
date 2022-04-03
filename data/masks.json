@@ -1,0 +1,92 @@
+[
+    {
+        "bottom-left": [259, 972],
+        "top-left": [272, 472],
+        "top-right": [1401, 459],
+        "bottom-right": [1416, 946]
+    },
+    {
+        "bottom-left": [232, 927],
+        "top-left": [252, 387],
+        "top-right": [1479, 383],
+        "bottom-right": [1490, 911]
+    },
+    {
+        "bottom-left": [133, 964],
+        "top-left": [162, 311],
+        "top-right": [1643, 308],
+        "bottom-right": [1653, 945]
+    },
+    {
+        "bottom-left": [641, 1646],
+        "top-left": [616, 635],
+        "top-right": [2945, 648],
+        "bottom-right": [2932, 1611]
+    },
+    {
+        "bottom-left": [935, 1519],
+        "top-left": [882, 828],
+        "top-right": [2490, 739],
+        "bottom-right": [2525, 1414]
+    },
+    {
+        "bottom-left": [632, 1586],
+        "top-left": [612, 613],
+        "top-right": [2894, 615],
+        "bottom-right": [2880, 1582]
+    },
+    {
+        "bottom-left": [133, 926],
+        "top-left": [149, 272],
+        "top-right": [1623, 287],
+        "bottom-right": [1625, 919]
+    },
+    {
+        "bottom-left": [168, 910],
+        "top-left": [183, 279],
+        "top-right": [1602, 295],
+        "bottom-right": [1602, 905]
+    },
+    {
+        "bottom-left": [120, 922],
+        "top-left": [142, 247],
+        "top-right": [1651, 267],
+        "bottom-right": [1653, 916]
+    },
+    {
+        "bottom-left": [210, 869],
+        "top-left": [312, 384],
+        "top-right": [1564, 338],
+        "bottom-right": [1748, 785]
+    },
+    {
+        "bottom-left": [213, 879],
+        "top-left": [318, 390],
+        "top-right": [1573, 347],
+        "bottom-right": [1762, 797]
+    },
+    {
+        "bottom-left": [214, 878],
+        "top-left": [318, 390],
+        "top-right": [1579, 347],
+        "bottom-right": [1764, 797]
+    },
+    {
+        "bottom-left": [99, 859],
+        "top-left": [114, 235],
+        "top-right": [1505, 263],
+        "bottom-right": [1500, 852]
+    },
+    {
+        "bottom-left": [160, 897],
+        "top-left": [170, 270],
+        "top-right": [1568, 274],
+        "bottom-right": [1573, 874]
+    },
+    {
+        "bottom-left": [292, 837],
+        "top-left": [301, 323],
+        "top-right": [1451, 326],
+        "bottom-right": [1458, 822]
+    }
+]

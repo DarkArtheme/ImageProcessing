@@ -1,6 +1,9 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include <format>
+#include <fstream>
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 void split_into_frames() {
     int video_total = 5;
@@ -48,7 +51,7 @@ std::vector<cv::Mat>& binarize_frames(std::vector<cv::Mat>& frames) {
     int c = 1;
     for (auto& frame : frames) {
         cv::cvtColor(frame, frame, cv::COLOR_BGRA2GRAY, 0);
-        cv::GaussianBlur(frame, frame, cv::Size(63, 63), 0);
+        cv::GaussianBlur(frame, frame, cv::Size(15, 15), 0);
         cv::threshold(frame, frame, threshold_value, max_binary_value, cv::THRESH_BINARY);
         cv::imwrite("./output/bin_frame" + std::to_string(c) + ".png", frame);
         c++;
@@ -70,6 +73,47 @@ std::vector<cv::Mat>& morph_images(std::vector<cv::Mat>& frames) {
     return frames;
 }
 
+std::vector<std::array<cv::Point, 4>> read_mask_points(std::string path) {
+    std::ifstream input(path);
+    std::vector<std::array<cv::Point, 4>> result;
+    auto jf = json::parse(input);
+    for (auto& elem : jf) {
+        std::array<cv::Point, 4> points;
+        points[0] = cv::Point(elem["bottom-left"].get<std::array<int, 2>>()[0], 
+                              elem["bottom-left"].get<std::array<int, 2>>()[1]);
+        points[1] = cv::Point(elem["top-left"].get<std::array<int, 2>>()[0], 
+                              elem["top-left"].get<std::array<int, 2>>()[1]);
+        points[2] = cv::Point(elem["top-right"].get<std::array<int, 2>>()[0], 
+                              elem["top-right"].get<std::array<int, 2>>()[1]);
+        points[3] = cv::Point(elem["bottom-right"].get<std::array<int, 2>>()[0], 
+                              elem["bottom-right"].get<std::array<int, 2>>()[1]);
+        result.push_back(points);
+    }
+    return result;
+}
+
+std::vector<cv::Mat> draw_masks(const std::vector<std::array<cv::Point, 4>>& points,
+                                const std::vector<cv::Mat>& images) {
+    size_t i = 0;
+    std::vector<cv::Mat> result;
+    for (const auto& vertexes : points) {
+        cv::Point pts[1][4];
+        pts[0][0] = vertexes[0];
+        pts[0][1] = vertexes[1];
+        pts[0][2] = vertexes[2];
+        pts[0][3] = vertexes[3];
+        const cv::Point* ppt[1] = { pts[0] };
+        int npt[] = { 4 };
+        auto img = images[i].clone();
+        img = 0;
+        cv::fillPoly(img, ppt, npt, 1, cv::Scalar(255, 255, 255), cv::LINE_8);
+        cv::imwrite("./output/mask" + std::to_string(i + 1) + ".png", img);
+        result.push_back(img);
+        ++i;
+    }
+    return result;
+}
+
 cv::Rect2i detect_banknote(const cv::Mat& image) {
     cv::Mat labels, stats, centroids;
     cv::connectedComponentsWithStats(image, labels, stats, centroids);
@@ -88,8 +132,7 @@ void print_image(const std::string& output_path, const cv::Mat& image) {
 
 int main() {
     const std::string output_path = "./output/random_frame.png";
-    size_t frame_idx = 144;
-    //split_into_frames();
+    split_into_frames();
     auto frames = read_images(15);
     auto image = frames[0];
     print_image(output_path, image);
@@ -98,5 +141,7 @@ int main() {
     auto binarized_image = frames[0];
     auto rect = detect_banknote(binarized_image);
     cv::rectangle(image, rect, cv::Scalar(0, 0, 255), 4);
+    auto r = read_mask_points("./data/masks.json");
+    draw_masks(r, frames);
     return 0;
 }
