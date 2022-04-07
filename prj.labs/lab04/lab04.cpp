@@ -61,12 +61,16 @@ std::vector<cv::Mat>& binarize_frames(std::vector<cv::Mat>& frames) {
 
 std::vector<cv::Mat>& morph_images(std::vector<cv::Mat>& frames) {
     int c = 1;
-    auto kernel = cv::Size(7, 7);
+//    auto kernel = cv::Size(7, 7);
+    auto kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(35, 10));
     for (auto& frame : frames) {
-        cv::morphologyEx(frame, frame, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, kernel));
-        cv::morphologyEx(frame, frame, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, kernel));
-        cv::dilate(frame, frame, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15)));
-        cv::erode(frame, frame, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15)));
+//        cv::morphologyEx(frame, frame, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, kernel));
+//        cv::morphologyEx(frame, frame, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, kernel));
+//        cv::dilate(frame, frame, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15)));
+//        cv::erode(frame, frame, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15)));
+        cv::morphologyEx(frame, frame, cv::MORPH_CLOSE, kernel);
+        cv::morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);
+        cv::dilate(frame, frame, kernel);
         cv::imwrite("./output/morph_frame" + std::to_string(c) + ".png", frame);
         c++;
     }
@@ -114,34 +118,149 @@ std::vector<cv::Mat> draw_masks(const std::vector<std::array<cv::Point, 4>>& poi
     return result;
 }
 
-cv::Rect2i detect_banknote(const cv::Mat& image) {
-    cv::Mat labels, stats, centroids;
-    cv::connectedComponentsWithStats(image, labels, stats, centroids);
-    int cmp_num = 1;
-    auto x = stats.at<int>(cmp_num, 0), y = stats.at<int>(cmp_num, 1);
-    auto width = stats.at<int>(cmp_num, 2), height = stats.at<int>(cmp_num, 3);
-    cv::Rect2i rect = { x, y, width, height };
-    
-    return rect;
+bool intersect(const cv::Rect& rect1, const cv::Rect& rect2) {
+    return rect1.contains(cv::Point(rect2.x, rect2.y)) || 
+        rect1.contains(cv::Point(rect2.x + rect2.width - 1, rect2.y + rect2.height - 1));
 }
 
-void print_image(const std::string& output_path, const cv::Mat& image) {
-    cv::imwrite(output_path, image);
-    std::cout << "Successfully written to '" << output_path << "'" << std::endl;
+void improve_mask(cv::Mat& mask, const cv::Mat& img) {
+    for (int i = 0; i < mask.rows; i++) {
+        int last_updated_ind = 0;
+        for (int j = 0; j < mask.cols; j++) {
+            if (img.at<uchar>(i, j) == 255) break;
+            else {
+                last_updated_ind++;
+                mask.at<uchar>(i, j) = 0;
+            }
+        }
+        for (int k = mask.cols - 1; k > last_updated_ind; k--) {
+            if (img.at<uchar>(i, k) == 255) break;
+            else {
+                mask.at<uchar>(i, k) = 0;
+            }
+        }
+    }
+}
+
+
+std::vector<cv::Mat>& get_mask(std::vector<cv::Mat>& frames) {
+    int c = 1;
+    for (auto& frame : frames) {
+        cv::Mat labels, stats, centroids;
+        cv::Mat selected_img_part(frame.rows, frame.cols, frame.type(), cv::Scalar(0, 0, 0));
+        cv::Mat mask(frame.rows, frame.cols, frame.type(), 255);
+        int max_comp_ind = 0, max_comp_stat = 0;
+
+        cv::connectedComponentsWithStats(frame, labels, stats, centroids);
+
+        for (int i = 1; i < stats.rows; i++) {
+            int square = stats.at<int>(i, 4);
+            if (square > max_comp_stat) {
+                max_comp_ind = i;
+                max_comp_stat = square;
+            }
+        }
+
+        cv::Rect2i max_component = { stats.at<int>(max_comp_ind, 0), 
+                                    stats.at<int>(max_comp_ind, 1), 
+                                    stats.at<int>(max_comp_ind, 2), 
+                                    stats.at<int>(max_comp_ind, 3) };
+
+        for (int i = max_component.x; i < max_component.x + max_component.width; i++) {
+            for (int j = max_component.y; j < max_component.y + max_component.height; j++) {
+                selected_img_part.at<uchar>(j, i) = frame.at<uchar>(j, i);
+                mask.at<uchar>(j, i) = 255;
+            }
+        }
+
+        for (int i = 1; i < stats.rows; i++) {
+            cv::Rect2i component = { stats.at<int>(i, 0), stats.at<int>(i, 1), stats.at<int>(i, 2), stats.at<int>(i, 3) };
+            if (i != max_comp_ind && intersect(max_component, component)) {
+                cv::rectangle(selected_img_part, component, 255, cv::FILLED);
+            }
+        }
+
+        improve_mask(mask, selected_img_part);
+        cv::imwrite("./output/improved_morph" + std::to_string(c) + ".png", frame);
+        c++;
+    }
+    return frames;
+}
+
+std::vector<cv::Mat> concatenate_masks(const std::vector<cv::Mat>& orig_frames, 
+                                       const std::vector<cv::Mat>& mask_frames, 
+                                       const std::vector<cv::Mat>& drawn_frames) {
+    auto result(orig_frames);
+    for (size_t i = 0; i < orig_frames.size(); ++i) {
+        cv::Mat rgb_image_channels[3];
+
+        cv::split(orig_frames[i], rgb_image_channels);
+        cv::max(rgb_image_channels[2], mask_frames[i], rgb_image_channels[2]);
+        cv::max(rgb_image_channels[1], drawn_frames[i], rgb_image_channels[1]);
+        cv::merge(rgb_image_channels, 3, result[i]);
+        cv::imwrite("./output/conc_frame" + std::to_string(i + 1) + ".png", result[i]);
+    }
+    return result;
+}
+
+std::vector<int> calc_intersect_masks(const std::vector<cv::Mat>& mask_frames, 
+                                      const std::vector<cv::Mat>& drawn_frames) {
+    int right_value = 255;
+    auto result = std::vector<int>(mask_frames.size());
+    for (size_t ind = 0; ind < mask_frames.size(); ind++) {
+        for (int i = 0; i < mask_frames[ind].rows; i++) {
+            for (int j = 0; j < mask_frames[ind].cols; j++) {
+                if (mask_frames[ind].at<uchar>(i, j) == right_value && 
+                    mask_frames[ind].at<uchar>(i, j) == drawn_frames[ind].at<uchar>(i, j)) {
+                    result[ind]++;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+std::vector<int> calc_union_masks(const std::vector<cv::Mat>& mask_frames, 
+                                  const std::vector<cv::Mat>& drawn_frames) {
+    int right_value = 255;
+    auto result = std::vector<int>(mask_frames.size());
+    for (size_t ind = 0; ind < mask_frames.size(); ind++) {
+        for (int i = 0; i < mask_frames[ind].rows; i++) {
+            for (int j = 0; j < mask_frames[ind].cols; j++) {
+                if (mask_frames[ind].at<uchar>(i, j) == right_value || 
+                    drawn_frames[ind].at<uchar>(i, j) == right_value) {
+                    result[ind]++;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+std::vector<double> calc_accuracy(const std::vector<cv::Mat>& mask_frames,
+                                  const std::vector<cv::Mat>& drawn_masks) {
+    std::ofstream out("./output/accuracy.txt", std::ios_base::out);
+    auto result = std::vector<double>(mask_frames.size());
+    auto int_masks = calc_intersect_masks(mask_frames, drawn_masks);
+    auto union_masks = calc_union_masks(mask_frames, drawn_masks);
+    for (size_t i = 0; i < mask_frames.size(); i++) {
+        result[i] = int_masks[i] * 1.0 / union_masks[i];
+        out << i + 1 << ") " << result[i] << std::endl;
+    }
+    return result;
 }
 
 int main() {
     const std::string output_path = "./output/random_frame.png";
-    split_into_frames();
+    //split_into_frames();
     auto frames = read_images(15);
-    auto image = frames[0];
-    print_image(output_path, image);
+    auto orig_frames(frames);
     binarize_frames(frames);
     morph_images(frames);
-    auto binarized_image = frames[0];
-    auto rect = detect_banknote(binarized_image);
-    cv::rectangle(image, rect, cv::Scalar(0, 0, 255), 4);
+    get_mask(frames);
     auto r = read_mask_points("./data/masks.json");
-    draw_masks(r, frames);
+    auto drawn_masks = draw_masks(r, frames);
+    concatenate_masks(orig_frames, frames, drawn_masks);
+    calc_accuracy(frames, drawn_masks);
     return 0;
 }
