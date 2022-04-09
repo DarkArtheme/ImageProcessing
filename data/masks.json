@@ -88,5 +88,41 @@
         "top-left": [301, 323],
         "top-right": [1451, 326],
         "bottom-right": [1458, 822]
+    },
+    {
+        "bottom-left": [197, 975],
+        "top-left": [229, 270],
+        "top-right": [1818, 253],
+        "bottom-right": [1823, 988]
+    },
+    {
+        "bottom-left": [161, 1003],
+        "top-left": [211, 242],
+        "top-right": [1907, 225],
+        "bottom-right": [1914, 1020]
+    },
+    {
+        "bottom-left": [148, 975],
+        "top-left": [189, 217],
+        "top-right": [1897, 198],
+        "bottom-right": [1910, 974]
+    },
+    {
+        "bottom-left": [91, 973],
+        "top-left": [143, 249],
+        "top-right": [1790, 242],
+        "bottom-right": [1846, 970]
+    },
+    {
+        "bottom-left": [77, 1018],
+        "top-left": [124, 276],
+        "top-right": [1808, 269],
+        "bottom-right": [1866, 1015]
+    },
+    {
+        "bottom-left": [56, 993],
+        "top-left": [104, 253],
+        "top-right": [1793, 243],
+        "bottom-right": [1848, 989]
     }
 ]

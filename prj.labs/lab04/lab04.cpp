@@ -6,7 +6,7 @@
 using json = nlohmann::json;
 
 void split_into_frames() {
-    int video_total = 5;
+    int video_total = 7;
 	const std::string video_path_prefix = "./data/banknote";
     for (int video_num = 0; video_num < video_total; ++video_num) {
 		cv::VideoCapture capture(video_path_prefix + std::to_string(video_num + 1) + ".mp4");
@@ -51,6 +51,7 @@ std::vector<cv::Mat>& binarize_frames(std::vector<cv::Mat>& frames) {
     int c = 1;
     for (auto& frame : frames) {
         cv::cvtColor(frame, frame, cv::COLOR_BGRA2GRAY, 0);
+        cv::imwrite("./output/grayscale_frame" + std::to_string(c) + ".png", frame);
         cv::GaussianBlur(frame, frame, cv::Size(15, 15), 0);
         cv::threshold(frame, frame, threshold_value, max_binary_value, cv::THRESH_BINARY);
         cv::imwrite("./output/bin_frame" + std::to_string(c) + ".png", frame);
@@ -252,8 +253,8 @@ std::vector<double> calc_accuracy(const std::vector<cv::Mat>& mask_frames,
 
 int main() {
     const std::string output_path = "./output/random_frame.png";
-    //split_into_frames();
-    auto frames = read_images(15);
+    split_into_frames();
+    auto frames = read_images(21);
     auto orig_frames(frames);
     binarize_frames(frames);
     morph_images(frames);
