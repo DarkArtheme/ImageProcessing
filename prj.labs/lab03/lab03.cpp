@@ -10,9 +10,15 @@ cv::Mat make_grayscale_img(const cv::Mat& img) {
 
 cv::Mat make_lup() {
 	cv::Mat lup_table(1, 256, CV_8U);
-	for (size_t i = 0; i < 256; ++i) {
+	/*for (size_t i = 0; i < 256; ++i) {
 		double res = i < 128 ? 2 * i : i / 2;
 		res = res > 255 ? 255 : res;
+		lup_table.at<uchar>(0, i) = static_cast<uchar>(res);
+	}*/
+	for (size_t i = 0; i < 256; ++i) {
+		double res = std::cos(i) * i * i * 8 / 5;
+		res = res > 255 ? 255 : res;
+		res = res < 0 ? 0 : res;
 		lup_table.at<uchar>(0, i) = static_cast<uchar>(res);
 	}
 	return lup_table;

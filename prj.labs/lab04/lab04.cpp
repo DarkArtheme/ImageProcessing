@@ -62,13 +62,8 @@ std::vector<cv::Mat>& binarize_frames(std::vector<cv::Mat>& frames) {
 
 std::vector<cv::Mat>& morph_images(std::vector<cv::Mat>& frames) {
     int c = 1;
-//    auto kernel = cv::Size(7, 7);
     auto kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(35, 10));
     for (auto& frame : frames) {
-//        cv::morphologyEx(frame, frame, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, kernel));
-//        cv::morphologyEx(frame, frame, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, kernel));
-//        cv::dilate(frame, frame, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15)));
-//        cv::erode(frame, frame, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15)));
         cv::morphologyEx(frame, frame, cv::MORPH_CLOSE, kernel);
         cv::morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);
         cv::dilate(frame, frame, kernel);

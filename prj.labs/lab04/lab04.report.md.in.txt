@@ -2,6 +2,8 @@
 Автор: Богданов А.А. <br>
 Дата: @time_stemp@
 
+Url: <https://github.com/DarkArtheme/ImageProcessing/tree/master/prj.labs/lab04>
+
 ### Задание
 1. Самостоятельно снимаем видео смартфоном
 - объект съемки - купюры (рубли разного номинала), расправленные и лежащие на поверхности (проективно искаженны прямоугольник)
@@ -19,94 +21,168 @@
 ### Результаты
 В ходе считывания видео были записаны следующие кадры (рис.1):<br>
 
-![](./output/frame14.png)
-![](./output/frame19.png)
-![](./output/frame3.png)
-Рис. 1. Исходные изображения. <br><br>
+<div style="display: flex; justify-content: space-between">
+  <div style="margin-right: 5px">
+    <img src="./output/frame14.png"/>
+  </div>
+  <div style="margin-right: 5px">
+    <img src="./output/frame19.png"/>
+  </div>
+  <div>
+    <img src="./output/frame3.png"/> 
+  </div>
+</div>
+<i style="font-size: 10pt;">Рис. 1. Исходные изображения.</i>
+</br>
 
-Затем было применено цветоредуцирование (рис. 2):<br>
 
-![](./output/grayscale_frame14.png)
-![](./output/grayscale_frame19.png)
-![](./output/grayscale_frame3.png)
-Рис. 2. Цветоредуцированные изображения. <br><br>
+Затем было применено цветоредуцирование при помощи функции `cvtColor` с параметром конвертации `COLOR_BGR2BGRAY`. Полученные изображения бинаризуются при помощи метода Оцу, используя функцию `threshold` (рис. 2):<br><br><br>
 
-Далее цветоредуцированные изображения бинаризуются при помощи метода Оцу (рис. 3):<br> 
+<div style="display: flex; justify-content: space-between">
+  <div style="margin-right: 5px">
+    <img src="./output/grayscale_frame14.png"/>
+  </div>
+  <div style="margin-right: 5px">
+    <img src="./output/grayscale_frame19.png"/>
+  </div>
+  <div>
+    <img src="./output/grayscale_frame3.png"/> 
+  </div>
+</div>
+<div style="display: flex; justify-content: space-between">
+  <div style="margin-right: 5px">
+    <img src="./output/bin_frame14.png"/>
+  </div>
+  <div style="margin-right: 5px">
+    <img src="./output/bin_frame19.png"/>
+  </div>
+  <div>
+    <img src="./output/bin_frame3.png"/> 
+  </div>
+</div>
+<i style="font-size: 10pt;">Рис. 2. Цветоредуцированные (сверху) и бинаризованные (снизу) изображения.</i>
+</br>
 
-![](./output/bin_frame14.png)
-![](./output/bin_frame19.png)
-![](./output/bin_frame3.png)
-Рис. 3. Бинаризированные изображения. <br><br>
+<br>
 
 Затем над бинаризированными изображения проводятся морфологические преобразования, 
-происходит очерчение более четких границ и удаление "шумов" (рис. 4):<br>
+происходит очерчение более четких границ и удаление "шумов" (рис. 3):<br>
 
-![](./output/morph_frame14.png)
-![](./output/morph_frame19.png)
-![](./output/morph_frame3.png)
-Рис. 4. Изображения после морфологической обработки. <br><br>
+<div style="display: flex; justify-content: space-between">
+  <div style="margin-right: 5px">
+    <img src="./output/morph_frame14.png"/>
+  </div>
+  <div style="margin-right: 5px">
+    <img src="./output/morph_frame19.png"/>
+  </div>
+  <div>
+    <img src="./output/morph_frame3.png"/> 
+  </div>
+</div>
+<i style="font-size: 10pt;">Рис. 3. Изображения после морфологической обработки.</i>
+</br>
 
-Далее для получения маски происходит нахождение наибольшей по площади компоненты связности, 
-а остальные компоненты связности закрашиваются в черный (рис. 5):<br>
+<br>
 
-![](./output/improved_morph14.png)
-![](./output/improved_morph19.png)
-![](./output/improved_morph3.png)
-Рис. 5. Программно полученные маски. <br><br>
+Далее для получения маски происходит нахождение наибольшей по площади компоненты связности (с помощью функции `connectedComponentsWithStats`), 
+а остальные компоненты связности закрашиваются в черный. Для проверки качества полученных масок вручную задаются эталонные маски (их координаты указываются в файле `./data/masks.json`) (рис. 4):<br>
 
-Для проверки качества полученных масок вручную задаются эталонные маски (рис. 6):<br>
 
-![](./output/mask14.png)
-![](./output/mask19.png)
-![](./output/mask3.png)
-Рис. 6. Эталонные маски. <br><br>
+<div style="display: flex; justify-content: space-between">
+  <div style="margin-right: 5px">
+    <img src="./output/improved_morph14.png"/>
+  </div>
+  <div style="margin-right: 5px">
+    <img src="./output/improved_morph19.png"/>
+  </div>
+  <div>
+    <img src="./output/improved_morph3.png"/> 
+  </div>
+</div>
+<div style="display: flex; justify-content: space-between">
+  <div style="margin-right: 5px">
+    <img src="./output/mask14.png"/>
+  </div>
+  <div style="margin-right: 5px">
+    <img src="./output/mask19.png"/>
+  </div>
+  <div>
+    <img src="./output/mask3.png"/> 
+  </div>
+</div>
+<i style="font-size: 10pt;">Рис. 4. Программно (сверху) и вручную (снизу) полученные маски.</i>
+</br>
 
-Для визуализации отличий масок используется наложение их на исходные кадры в разных цветовых каналах (рис. 7):<br>
+<br>
+
+Чтобы визуализировать отличия масок используется наложение их на исходные кадры с использованием разных цветовых каналах (рис. 5):<br>
 - Красный - программная маска
 - Зеленый - эталонная маска
 - Желтый - пересечение масок
 
-![](./output/conc_frame14.png)
-![](./output/conc_frame19.png)
-![](./output/conc_frame3.png)
-Рис. 7. Визуализация отличий. <br>
+<div style="display: flex; justify-content: space-between">
+  <div style="margin-right: 5px">
+    <img src="./output/conc_frame14.png"/>
+  </div>
+  <div style="margin-right: 5px">
+    <img src="./output/conc_frame19.png"/>
+  </div>
+  <div>
+    <img src="./output/conc_frame3.png"/> 
+  </div>
+</div>
+<i style="font-size: 10pt;">Рис. 5. Визуализация отличий. </i>
+</br>
+
+<br>
 
 При сравнении масок можно заметить, что маски купюр в первых двух случаях определены довольно точно, 
-чего нельзя сказать о третьем. Из-за засвета в левом нижнем углу маска вычислилась неточно.
+в то время как в третьем мы получили неудовлетворительный результат. Из-за засвета в левом нижнем углу маска вычислилась неточно.
+
+<br>
 
 ### Точность программных масок
-Точностью программной маски относительно эталонной будем считать отношение пересечения пикселей
-масок на их объединение. Полученная оценка показывает коэффициент соответствия от 0 до 1, 
-причем, чем ближе к 1, тем идентичнее маски.
+Точностью программной маски относительно эталонной считается отношение пересечения пикселей масок на их объединение согласно формуле:
+$$A = \frac{T ∩ P}{T ∪ P},$$
+где </br>*T (target)* - множество пикселей программной маски
+    </br>*P (predicted)* - множество пикселей эталонной маски</br>
+Полученная оценка показывает степень соответствия от 0 до 1, где чем ближе к 1, тем идентичнее маски.
 
-Ниже приведены точности для 21 изображения (по 3 кадра из 7 видео). Изображения из отчета - это картинки под номером 14 19 и 3 соответственно.
+Ниже приведены точности для 21 изображения (по 3 кадра из 7 видео) с точностью до двух знаков после запятой. Изображения из отчета - это картинки под номером 14 19 и 3 соответственно.
 
 Название файла | Точность
 ---------------|---------
-frame1.png     |0.657676
-frame2.png     |0.5992
-frame3.png     |0.731466
-frame4.png     |0.3992
-frame5.png     |0.650136
-frame6.png     |0.567802
-frame7.png     |0.441232
-frame8.png     |0.404791
-frame9.png     |0.4503
-frame10.png    |0.806054
-frame11.png    |0.81186
-frame12.png    |0.814829
-frame13.png    |0.955682
-frame14.png    |0.958126
-frame15.png    |0.9535
-frame16.png    |0.921262
-frame17.png    |0.928383
-frame18.png    |0.910459
-frame19.png    |0.907504
-frame20.png    |0.902741
-frame21.png    |0.902637
+frame1.png     |0.66
+frame2.png     |0.60
+frame3.png     |0.73
+frame4.png     |0.40
+frame5.png     |0.65
+frame6.png     |0.57
+frame7.png     |0.44
+frame8.png     |0.41
+frame9.png     |0.45
+frame10.png    |0.81
+frame11.png    |0.81
+frame12.png    |0.81
+frame13.png    |0.96
+frame14.png    |0.96
+frame15.png    |0.96
+frame16.png    |0.92
+frame17.png    |0.93
+frame18.png    |0.91
+frame19.png    |0.91
+frame20.png    |0.90
+frame21.png    |0.90
 
 
-Точность получилась неидеальная, но если купюра расположена не на светлом фоне, то маска определяется почти безошибочно.
+Точность получилась неидеальная, однако на 9 изображениях маска определяется почти безошибочно. На 6 изображениях маска определилась удовлетворительно и еще на 6 - плохо.
+
+<div style="margin-right: 5px">
+    <img src="./data/plot.png"/>
+</div>
+<i style="font-size: 10pt;">Рис. 6. Гистограмма распределения точности полученных масок. </i>
+
+<br>
 
 ### Текст программы
 
